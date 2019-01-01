@@ -1,5 +1,7 @@
-const ServerName = "Andecola";
-const ServerLink = "http://jevi.ga:3000";
+const args = process.argv;
+
+const ServerName = args[2];// "Andecola"
+const ServerLink = args[3];// "http://jevi.ga:3000"
 const ServerVersion = "1.0.0";
 
 const moment = require('moment');

@@ -63,7 +63,7 @@ app.get('/', (req, res) => {
 });
 
 var ScriptInst = {
-	"1.0":fs.readFileSync('JeviClient-1.0.html', 'utf8')
+	"1.0":fs.readFileSync('JeviClient-1.0.html', 'utf8').replace(/%0/g,ServerLink)
 };
 
 app.get('/install', (req, res) => {

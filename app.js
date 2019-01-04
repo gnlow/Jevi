@@ -63,8 +63,7 @@ app.get('/', (req, res) => {
 });
 
 var ScriptInst = {
-	"1.0":"<script>Entry.block.add_value_to_list.func = function (e,t){var n=t.getField('LIST',t),o=t.getValue('VALUE',t),r=Entry.variableContainer.getList(n,e);return r.array_||(r.array_=[]),r.array_.push({data:o}),$.get('"+ServerLink+"/?cod=push&_id='+Entry.projectId+'&varName='+r.name_+'&data='+o,function(data){}),r.updateView(),t.callReturn()};setInterval(function(){for(var i=0;i<Entry.variableContainer.getListByName('JVset').array_.length;i++){ var cont = Entry.variableContainer.getListByName('JVset');$.get('"+ServerLink+"/?cod=get&_id='+Entry.projectId+'&varName='+cont.array_[i].data,function(_d){Entry.variableContainer.getListByName(_d.result.varn).setArray(_d.basic.concat(_d.result._data));});}},100);</script>",
-
+	"1.0":fs.readFileSync('JeviClient-1.0.html', 'utf8')
 };
 
 app.get('/install', (req, res) => {

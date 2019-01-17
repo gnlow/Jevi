@@ -2,7 +2,7 @@ const args = process.argv;
 
 const ServerName = args[2];// "Andecola"
 const ServerLink = args[3];// "http://jevi.ga:3000"
-const ServerVersion = "1.0.0";
+const ServerVersion = "1.1.0";
 
 const moment = require('moment');
 
@@ -43,27 +43,41 @@ app.get('/reg', (req, res) => {
 
 app.get('/', (req, res) => {
 	crypto.pbkdf2(req.ip, '궥2s샳3운횥', 4937, 16, 'sha256', (err, key) => {
-		basic = [{data:"JVstart"},{data:ServerName},{data:ServerVersion},{data:'['+key.toString('base64')+']'}];
+		basic = [{data:"JVstart"},{data:ServerName},{data:ServerVersion},{data:key.toString('base64')}];
 		if(!(stor[req.query._id + '_' + req.query.varName])){
 			stor[req.query._id + '_' + req.query.varName] = [];
 		}
-
+		if(!(stor[req.query._id + '_' + "JVvar"])){
+			stor[req.query._id + '_' + "JVvar"] = {};
+		}
 
 		if(req.query.cod == "push"){
-
-			stor[req.query._id + '_' + req.query.varName].push({data:'['+key.toString('base64')+']'+req.query.data});
-
+			if(req.query.type == "list"){
+				stor[req.query._id + '_' + req.query.varName].push({data:key.toString('base64')+req.query.data});
+			}else if(req.query.type == "var"){
+				if(!stor[req.query._id + '_' + "JVvar"][key.toString('base64')]){
+					stor[req.query._id + '_' + "JVvar"][key.toString('base64')] = {};
+				}
+				stor[req.query._id + '_' + "JVvar"][key.toString('base64')][req.query.varName] = req.query.data;
+			}
 			//console.log(req.query);
 
 		}
-		ret._data = stor[req.query._id + '_' + req.query.varName];
+		if(req.query.type == "list"){
+			ret._data = stor[req.query._id + '_' + req.query.varName];	
+			ret.type = "list";
+		}else if(req.query.type == "var"){
+			ret._data = stor[req.query._id + '_' + "JVvar"];	
+			ret.type = "var";
+		}
 		ret.varn = req.query.varName;
 		res.send({"result":ret, "basic":basic});
 	});
 });
 
 var ScriptInst = {
-	"1.0":fs.readFileSync('JeviClient-1.0.html', 'utf8').replace(/%0/g,ServerLink)
+	"1.0":fs.readFileSync('JeviClient-1.0.html', 'utf8').replace(/%0/g,ServerLink),
+	"1.1":fs.readFileSync('JeviClient-1.1.html', 'utf8').replace(/%0/g,ServerLink),
 };
 
 app.get('/install', (req, res) => {
@@ -77,7 +91,7 @@ app.get('/install', (req, res) => {
  	//res.send("var pr = Entry.projectId;var jevi = 'Jevi v1.0 by Dark';$.get('http://jevi.ga:3000/reg/?project='+pr, function(dd){	Entry.variableContainer.getListByName('JVinfo').setArray([{data:String(dd*4+1)+','+String(dd*4+2)+','+String(dd*4+3)+','+String(dd*4+4)}]);	console.log('Jevi running!');	setInterval(function() {		if(Entry.variableContainer.getListByName('JVset').array_.length == 2){			var upset = Entry.variableContainer.getListByName('JVset').array_[0].data.split(',');			var dnset = Entry.variableContainer.getListByName('JVset').array_[1].data.split(',');			var up = [String(dd*4+(upset[0]-1)%4+1), String(dd*4+(upset[1]-1)%4+1)];			var dn = [String(dd*4+(dnset[0]-1)%4+1), String(dd*4+(dnset[1]-1)%4+1)];			var vl = Entry.variableContainer;			for(var i=0;i<vl.variables_.length;i++){				if((vl.variables_[i].name_.substr(0, 4) == 'JVup')  && (up.indexOf(String(dd*4+Number(vl.variables_[i].name_.substring(4, vl.variables_[i].name_.length))))!== -1)){									var vala = vl.getVariableByName(vl.variables_[i].name_);					$.get('http://jevi.ga:3000/?room='+(dd*4+vl.variables_[i].name_.substring(4, vl.variables_[i].name_.length))+'&data='+vala.value_,						function(data){});					}				if((vl.variables_[i].name_.substr(0, 4) == 'JVdn')  && (dn.indexOf(String(dd*4+Number(vl.variables_[i].name_.substring(4, vl.variables_[i].name_.length))))!== -1)){									var valc = vl.getVariableByName(vl.variables_[i].name_);					$.get('http://jevi.ga:3000/?room='+(dd*4+vl.variables_[i].name_.substring(4, vl.variables_[i].name_.length)),						function(data){valc.setValue(data)});					}			}		}	}, 100);});");
  	//res.send("var pr = Entry.projectId;var jevi = 'Jevi v1.0 by Dark';$.get('http://jevi.ga:3000/reg/?project='+pr, function(dd){	Entry.variableContainer.getListByName('JVinfo').setArray([{data:String(dd*4+1)+','+String(dd*4+2)+','+String(dd*4+3)+','+String(dd*4+4)}]);	console.log('Jevi running!');	setInterval(function() {		if(Entry.variableContainer.getListByName('JVset').array_.length == 2){			var upset = Entry.variableContainer.getListByName('JVset').array_[0].data.split(',');			var dnset = Entry.variableContainer.getListByName('JVset').array_[1].data.split(',');			var up = [String(dd*4+(upset[0]-1)%4+1), String(dd*4+(upset[1]-1)%4+1)];			var dn = [String(dd*4+(dnset[0]-1)%4+1), String(dd*4+(dnset[1]-1)%4+1)];			var vl = Entry.variableContainer;			for(var i=0;i<vl.variables_.length;i++){				if((vl.variables_[i].name_.substr(0, 4) == 'JVup')  && (up.indexOf(String(dd*4+Number(vl.variables_[i].name_.substring(4, vl.variables_[i].name_.length))))!== -1)){									var vala = vl.getVariableByName(vl.variables_[i].name_);					$.get('http://jevi.ga:3000/?room='+(dd*4+Number(vl.variables_[i].name_.substring(4, vl.variables_[i].name_.length)))+'&data='+vala.value_,						function(data){});					}				if((vl.variables_[i].name_.substr(0, 4) == 'JVdn')  && (dn.indexOf(String(dd*4+Number(vl.variables_[i].name_.substring(4, vl.variables_[i].name_.length))))!== -1)){									var valc = vl.getVariableByName(vl.variables_[i].name_);					$.get('http://jevi.ga:3000/?room='+(dd*4+Number(vl.variables_[i].name_.substring(4, vl.variables_[i].name_.length))),						function(data){valc.setValue(data)});					}			}		}	}, 100);});");
  	//res.send("<script>Entry.block.add_value_to_list.func = function (e,t){	var n=t.getField('LIST',t),o=t.getValue('VALUE',t),r=Entry.variableContainer.getList(n,e);return r.array_||(r.array_=[]),r.array_.push({data:o}),$.get('http://jevi.ga:3000/?cod=push&_id='+Entry.projectId+'&varName='+r.name_+'&data='+o,function(data){}),r.updateView(),t.callReturn()};setInterval(function(){	for(var i=0;i<Entry.variableContainer.getListByName('JVset').array_.length;i++){		var cont = Entry.variableContainer.getListByName('JVset');		var ni = i;		$.get('http://jevi.ga:3000/?cod=get&_id='+Entry.projectId+'&varName='+cont.array_[ni].data,function(_d){			console.log(ni);			Entry.variableContainer.getListByName(cont.array_[ni].data).setArray(_d);			});	}},100);</script>");
- 	res.send(ScriptInst["1.0"]);
+ 	res.send(ScriptInst["1.1"]);
  });
 app.listen(process.env.PORT || 3000, () => {
 	console.log("Jevi start! at "+moment().format()+"\n ServerName : "+ServerName+"\n ServerLink : "+ServerLink+"\n ServerVersion : "+ServerVersion);
